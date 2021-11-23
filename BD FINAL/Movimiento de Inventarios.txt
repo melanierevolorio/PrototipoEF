@@ -1,0 +1,236 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+
+-- -----------------------------------------------------
+-- Schema PrototipoEF
+-- -----------------------------------------------------
+
+
+-- -----------------------------------------------------
+-- Schema PrototipoEF
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `PrototipoEF` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+USE `PrototipoEF` ;
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`Bodega`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`Bodega` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`Bodega` (
+  `idBodega` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NULL,
+  PRIMARY KEY (`idBodega`),
+  UNIQUE INDEX `IdBodega_UNIQUE` (`idBodega` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`Producto`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`Producto` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`Producto` (
+  `idProducto` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NULL,
+  `precio` FLOAT NULL,
+  PRIMARY KEY (`idProducto`),
+  UNIQUE INDEX `IdProducto_UNIQUE` (`idProducto` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`InventarioBodega`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`InventarioBodega` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`InventarioBodega` (
+  `idInventarioBodega` INT  NOT NULL AUTO_INCREMENT,
+  `idBodega` INT NULL,
+  `idProducto` INT NULL,
+  `cantidad` VARCHAR(45) NULL,
+  PRIMARY KEY (`idInventarioBodega`),
+  INDEX `fk_Inventario_Bodega1_idx` (`idBodega` ASC) VISIBLE,
+  INDEX `fk_Inventario_Producto1_idx` (`idProducto` ASC) VISIBLE,
+  UNIQUE INDEX `IdInventario_UNIQUE` (`idInventarioBodega` ASC) VISIBLE,
+  CONSTRAINT `fk_Inventario_Bodega1`
+    FOREIGN KEY (`idBodega`)
+    REFERENCES `PrototipoEF`.`Bodega` (`idBodega`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Inventario_Producto1`
+    FOREIGN KEY (`idProducto`)
+    REFERENCES `PrototipoEF`.`Producto` (`idProducto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`Factura`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`Factura` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`Factura` (
+  `idFactura` INT  NOT NULL AUTO_INCREMENT,
+  `fecha` DATE NULL,
+  `cantidad` INT NULL,
+  PRIMARY KEY (`idFactura`),
+  UNIQUE INDEX `IdFactura_UNIQUE` (`idFactura` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`Empresa`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`Empresa` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`Empresa` (
+  `idEmpresa` INT  NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NULL,
+  PRIMARY KEY (`idEmpresa`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`Sucursal`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`Sucursal` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`Sucursal` (
+  `idSucursal` INT  NOT NULL AUTO_INCREMENT,
+  `idEmpresa` INT NULL,
+  PRIMARY KEY (`idSucursal`),
+  INDEX `fk_Sucursal_Empresa1_idx` (`idEmpresa` ASC) VISIBLE,
+  CONSTRAINT `fk_Sucursal_Empresa1`
+    FOREIGN KEY (`idEmpresa`)
+    REFERENCES `PrototipoEF`.`Empresa` (`idEmpresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`InventarioSucursal`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`InventarioSucursal` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`InventarioSucursal` (
+  `idInventarioSucursal` INT NOT NULL AUTO_INCREMENT,
+  `idSucursal` INT NULL,
+  `idProducto` INT NULL,
+  `cantidad` INT NULL,
+  PRIMARY KEY (`idInventarioSucursal`),
+  UNIQUE INDEX `idInventarioSucursal_UNIQUE` (`idInventarioSucursal` ASC) VISIBLE,
+  INDEX `fk_InventarioSucursal_Sucursal1_idx` (`idSucursal` ASC) VISIBLE,
+  INDEX `fk_InventarioSucursal_Producto1_idx` (`idProducto` ASC) VISIBLE,
+  CONSTRAINT `fk_InventarioSucursal_Sucursal1`
+    FOREIGN KEY (`idSucursal`)
+    REFERENCES `PrototipoEF`.`Sucursal` (`idSucursal`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_InventarioSucursal_Producto1`
+    FOREIGN KEY (`idProducto`)
+    REFERENCES `PrototipoEF`.`Producto` (`idProducto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`FacturaDetalle`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`FacturaDetalle` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`FacturaDetalle` (
+  `idFacturaDetalle` INT  NOT NULL AUTO_INCREMENT,
+  `idFactura` INT NULL,
+  `idInventarioSucursal` INT NULL,
+  PRIMARY KEY (`idFacturaDetalle`),
+  UNIQUE INDEX `idFacturaDetalle_UNIQUE` (`idFacturaDetalle` ASC) VISIBLE,
+  INDEX `fk_FacturaDetalle_Factura1_idx` (`idFactura` ASC) VISIBLE,
+  INDEX `fk_FacturaDetalle_InventarioSucursal1_idx` (`idInventarioSucursal` ASC) VISIBLE,
+  CONSTRAINT `fk_FacturaDetalle_Factura1`
+    FOREIGN KEY (`idFactura`)
+    REFERENCES `PrototipoEF`.`Factura` (`idFactura`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_FacturaDetalle_InventarioSucursal1`
+    FOREIGN KEY (`idInventarioSucursal`)
+    REFERENCES `PrototipoEF`.`InventarioSucursal` (`idInventarioSucursal`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`OrdenCompra`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`OrdenCompra` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`OrdenCompra` (
+  `idOrdenCompra` INT NOT NULL AUTO_INCREMENT,
+  `fecha` DATE NULL,
+  PRIMARY KEY (`idOrdenCompra`),
+  UNIQUE INDEX `idOrdenCompra_UNIQUE` (`idOrdenCompra` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PrototipoEF`.`OrdenCompraDetalle`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PrototipoEF`.`OrdenCompraDetalle` ;
+
+CREATE TABLE IF NOT EXISTS `PrototipoEF`.`OrdenCompraDetalle` (
+  `idOrdenCompraDetalle` INT NOT NULL AUTO_INCREMENT,
+  `idOrdenCompra` INT NULL,
+  `idInventarioBodega` INT NULL,
+  `cantidad` INT NULL,
+  PRIMARY KEY (`idOrdenCompraDetalle`),
+  UNIQUE INDEX `idOrdenCompraDetalle_UNIQUE` (`idOrdenCompraDetalle` ASC) VISIBLE,
+  INDEX `fk_OrdenCompraDetalle_OrdenCompra1_idx` (`idOrdenCompra` ASC) VISIBLE,
+  INDEX `fk_OrdenCompraDetalle_InventarioBodega1_idx` (`idInventarioBodega` ASC) VISIBLE,
+  CONSTRAINT `fk_OrdenCompraDetalle_OrdenCompra1`
+    FOREIGN KEY (`idOrdenCompra`)
+    REFERENCES `PrototipoEF`.`OrdenCompra` (`idOrdenCompra`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_OrdenCompraDetalle_InventarioBodega1`
+    FOREIGN KEY (`idInventarioBodega`)
+    REFERENCES `PrototipoEF`.`InventarioBodega` (`idInventarioBodega`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+SELECT * FROM prototipoef.producto;
+
+INSERT INTO producto VALUES (NULL,"Lapiceros",10);
+INSERT INTO producto VALUES (NULL,"Cuadernos",20);
+INSERT INTO producto VALUES (NULL,"Borrador",5);
+INSERT INTO producto VALUES (NULL,"Sacapuntas",15);
+INSERT INTO producto VALUES (NULL,"Crayones",10);
+INSERT INTO producto VALUES (NULL,"Marcadores",10);
+
+INSERT INTO empresa VALUES (NULL,"Empresa Final Sistemas");
+
+INSERT INTO bodega VALUES (NULL,"Central");
+INSERT INTO bodega VALUES (NULL,"Jutiapa");
+INSERT INTO bodega VALUES (NULL,"Zapaca");
+INSERT INTO bodega VALUES (NULL,"Peten");
+INSERT INTO bodega VALUES (NULL,"Puerto Barrios");
+
+INSERT INTO factura VALUES (NULL,now(),1);
+INSERT INTO factura VALUES (NULL,now(),100);
+INSERT INTO factura VALUES (NULL,now(),15);
+INSERT INTO factura VALUES (NULL,now(),80);
+INSERT INTO factura VALUES (NULL,now(),785);
+INSERT INTO factura VALUES (NULL,now(),96);
